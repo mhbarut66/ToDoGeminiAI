@@ -1,7 +1,5 @@
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
-
-from aiohttp import payload_type
 from aiohttp.abc import HTTPException
 from fastapi import APIRouter, Depends
 from passlib.context import CryptContext
@@ -40,6 +38,7 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     role: str
+    phone_number: str
 
 class Token(BaseModel):
     access_token: str
@@ -80,7 +79,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         last_name=create_user_request.last_name,
         role=create_user_request.role,
         is_active=True,
-        hashed_password=bcrypt_context.hash(create_user_request.password)
+        hashed_password=bcrypt_context.hash(create_user_request.password),
+        phone_number=create_user_request.phone_number
     )
     db.add(user)
     db.commit()
