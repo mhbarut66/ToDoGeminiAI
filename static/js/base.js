@@ -16,25 +16,29 @@
             };
 
             try {
+                const token = getCookie('access_token');
+                if (!token) {
+                    throw new Error('Authentication token not found');
+                }
+
                 const response = await fetch('/todo/todo', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getCookie('access_token')}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
-                    form.reset(); // Clear the form
+                    window.location.href = '/todo/todo-page';
                 } else {
-                    // Handle error
                     const errorData = await response.json();
-                    alert(`Error: ${errorData.detail}`);
+                    throw new Error(errorData.detail || 'Bir hata oluştu');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                alert(error.message || 'Bilinmeyen bir hata oluştu');
             }
         });
     }
@@ -59,12 +63,9 @@
 
         try {
             const token = getCookie('access_token');
-            console.log(token)
             if (!token) {
                 throw new Error('Authentication token not found');
             }
-
-            console.log(`${todoId}`)
 
             const response = await fetch(`/todo/todo/${todoId}`, {
                 method: 'PUT',
@@ -75,16 +76,16 @@
                 body: JSON.stringify(payload)
             });
 
-            if (response.ok) {
-                window.location.href = '/todo/todo-page'; // Redirect to the todo page
-            } else {
-                // Handle error
+            if (!response.ok) {
                 const errorData = await response.json();
-                alert(`Error: ${errorData.detail}`);
+                console.error('Response:', await response.text());  // Hata ayıklama için
+                throw new Error(errorData.detail || 'Bir hata oluştu');
             }
+
+            window.location.href = '/todo/todo-page';
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            alert(error.message || 'Bilinmeyen bir hata oluştu');
         }
     });
 
@@ -176,7 +177,7 @@
             const data = Object.fromEntries(formData.entries());
 
             if (data.password !== data.password2) {
-                alert("Passwords do not match");
+                alert("Şifreler eşleşmiyor!");
                 return;
             }
 
@@ -191,7 +192,7 @@
             };
 
             try {
-                const response = await fetch('/auth', {
+                const response = await fetch('/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -200,15 +201,15 @@
                 });
 
                 if (response.ok) {
+                    alert("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.");
                     window.location.href = '/auth/login-page';
                 } else {
-                    // Handle error
                     const errorData = await response.json();
-                    alert(`Error: ${errorData.message}`);
+                    alert(`Hata: ${errorData.detail || 'Bilinmeyen bir hata oluştu'}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
             }
         });
     }
