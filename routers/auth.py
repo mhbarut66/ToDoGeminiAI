@@ -7,8 +7,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_201_CREATED, HTTP_401_UNAUTHORIZED
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from database import SessionLocal
-from models import User
+from ..database import SessionLocal
+from ..models import User
 from jose import jwt, JWTError
 from fastapi.templating import Jinja2Templates
 
@@ -17,7 +17,7 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 
 SECRET_KEY = "efkr67f0anmdl7tio44zgitksyigyyva"
 ALGORITHM = "HS256"
