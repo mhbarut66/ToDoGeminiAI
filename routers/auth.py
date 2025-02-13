@@ -53,8 +53,13 @@ def create_access_token(username: str, user_id: int, role: str, expires_delta: t
     payload.update({"exp": expires})
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
+from fastapi import HTTPException
+from starlette.status import HTTP_401_UNAUTHORIZED
+
 def authenticate_user(db, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
     if not bcrypt_context.verify(password, user.hashed_password):
         return None
     return user
